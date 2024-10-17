@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking System</title>
+</head>
+<body>
+  <h1>Submit Score</h1>
+  <form id="scoreForm">
+    <input type="text" id="name" placeholder="Your Name" required />
+    <input type="number" id="score" placeholder="Your Score" required />
+    <button type="submit">Submit</button>
+  </form>
+
+  <h1>Leaderboard</h1>
+  <ul id="leaderboard"></ul>
+
+  <script>
+    const scriptUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+    // 점수 제출 함수
+    document.getElementById('scoreForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const score = document.getElementById('score').value;
+
+      fetch(`${scriptUrl}?action=submitScore&name=${name}&score=${score}`)
+        .then(response => response.json())
+        .then(data => {
+          alert('Score submitted!');
+          loadLeaderboard();
+        });
+    });
+
+    // 순위 불러오는 함수
+    function loadLeaderboard() {
+      fetch(`${scriptUrl}?action=getLeaderboard`)
+        .then(response => response.json())
+        .then(data => {
+          const leaderboard = document.getElementById('leaderboard');
+          leaderboard.innerHTML = '';
+          data.forEach((row, index) => {
+            const li = document.createElement('li');
+            li.textContent = `${index + 1}. ${row[0]}: ${row[1]}`;
+            leaderboard.appendChild(li);
+          });
+        });
+    }
+
+    // 페이지가 로드될 때 순위를 불러옴
+    window.onload = loadLeaderboard;
+  </script>
+</body>
+</html>
